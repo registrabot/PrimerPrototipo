@@ -1,5 +1,3 @@
-## mainFlow.py
-
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -19,6 +17,7 @@ from view_module.VTotalClass import *
 import RPi.GPIO as GPIO
 import threading
 
+venta_info = []
 def update_weight():
     while True:
         try:
@@ -43,6 +42,7 @@ def MainKeyController():
                 next_view = V_Product.MatrixKeyPressEvent(key)
                 if next_view == "VProductList":
                     V_ProductList.mostrar_elementos(V_Product.product_list)
+                    V_ProductList.showFullScreen()
                     V_ProductList.show()
                     actual_view = "VProductList"
          
@@ -53,7 +53,9 @@ def MainKeyController():
                     V_Product.product_list = V_ProductList.product_list
                     V_Product._item.setText(f"{len(V_ProductList.product_list)}")
                     V_ProductList.hide()
+                    V_Product.showFullScreen()
                     V_Product.show()
+                    V_Product.seleccion = False # Por analizar cambio de variable
                     actual_view = "VProduct"
 
                 elif next_view == "VConfirm":
@@ -76,12 +78,14 @@ def MainKeyController():
                     V_Product.product_list = V_ProductList.product_list
                     V_Product._item.setText(f"{len(V_ProductList.product_list)}")
                     V_ProductList.hide()
+                    
+                    V_Product.showFullScreen()
                     V_Product.show()
                     actual_view = "VProduct"
             
             elif actual_view == "VPayment":
 
-                next_view = V_Payment.MatrixKeyPressEvent(key)
+                next_view, payment_method = V_Payment.MatrixKeyPressEvent(key)
                 
                 if next_view == "VDWallet":
                     V_DWallet.show_in_center(V_ProductList.geometry())
@@ -91,6 +95,11 @@ def MainKeyController():
                     V_Total.show_in_center(V_ProductList.geometry())
                     V_Total.show_total(V_ProductList.suma_total)
                     actual_view = "VTotal"
+
+                    venta_info.clear()
+                    venta_info.append(payment_method)
+                    venta_info.append(V_ProductList.product_list)
+                    V_Total.venta_info = venta_info
 
                 elif next_view == "VConfirm":
                     V_Confirm.show_in_center(V_ProductList.geometry())
@@ -103,15 +112,22 @@ def MainKeyController():
                     V_Product.product_list = V_ProductList.product_list
                     V_Product._item.setText(f"{len(V_ProductList.product_list)}")
                     V_ProductList.hide()
+                    
+                    V_Product.showFullScreen()
                     V_Product.show()
                     actual_view = "VProduct"
 
             elif actual_view == "VDWallet":
-                next_view = V_DWallet.MatrixKeyPressEvent(key)
+                next_view, payment_method = V_DWallet.MatrixKeyPressEvent(key)
                 if next_view == "VTotal":
                     V_Total.show_in_center(V_ProductList.geometry())
                     V_Total.show_total(V_ProductList.suma_total)
                     actual_view = "VTotal"
+
+                    venta_info.clear()
+                    venta_info.append(payment_method)
+                    venta_info.append(V_ProductList.product_list)
+                    V_Total.venta_info = venta_info
 
             elif actual_view == "VTotal":
                 next_view = V_Total.MatrixKeyPressEvent(key)
@@ -119,6 +135,7 @@ def MainKeyController():
                 if next_view == "VPayment":
                     V_Payment.show_in_center(V_ProductList.geometry())
                     actual_view = "VPayment"
+                    venta_info.clear()
 
                 elif next_view == "VProduct":
                     V_ProductList.product_list.clear()
@@ -127,8 +144,12 @@ def MainKeyController():
                     V_Product.product_list = V_ProductList.product_list
                     V_Product._item.setText(f"{len(V_ProductList.product_list)}")
                     V_ProductList.hide()
+                    
+                    V_Product.showFullScreen()
                     V_Product.show()
-                    actual_view = "VProduct"        
+                    V_Product.seleccion = False
+                    actual_view = "VProduct"     
+                    venta_info.clear()   
                     
             #buzzer_controller.finish_sound()
 

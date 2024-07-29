@@ -3,20 +3,20 @@ import sys
 import time
 from tabulate import tabulate
 print('Original sys.path:', sys.path)
-sys.path.append('/Python-Thermal-Printer')
+sys.path.append('/home/pato/rb_workspace/PrimerPrototipo/RegistraBOT_ws/src/ticketprinter_module/Python-Thermal-Printer')
 print('Updated sys.path:', sys.path)
 from Adafruit_Thermal import *
 
 class TicketPrinter:
     def __init__(self):
-        self.printer = Adafruit_Thermal("/dev/ttyUSB0", 9600, timeout=5)
+        self.printer = Adafruit_Thermal("/dev/ttyS0", 9600, timeout=5)
         self.lista_productos = []
         self.precio_suma_total = 0.0
     
-    def agregar_producto(self, codigo, nombre, categoria, cantidad, unidad, precio):
+    def agregar_producto(self, nombre, cantidad, precio):
         # Limitar el nombre del producto a 20 caracteres
         nombre_truncado = nombre[:9]
-        self.lista_productos.append([codigo, nombre_truncado, categoria, cantidad, unidad, precio])
+        self.lista_productos.append([nombre_truncado, cantidad, precio])
         self.precio_suma_total += cantidad * precio
 
     def imprimir_ticket(self):
@@ -31,7 +31,7 @@ class TicketPrinter:
         ticket_text += "PRODUCTOS:\n"
         
         for producto in self.lista_productos:
-            datos_imprimir = [producto[1], producto[3], producto[5]]
+            datos_imprimir = [producto[0], producto[1], producto[2]]
             lista_imprimir.append(datos_imprimir)
         
         table = tabulate(lista_imprimir, headers=['Producto', 'QTY', 'Precio'], tablefmt="simple")

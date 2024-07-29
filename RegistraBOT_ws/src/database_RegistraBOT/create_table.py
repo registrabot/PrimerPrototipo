@@ -32,13 +32,14 @@ cursor.execute('''
 # Crear la tabla con la nueva columna insert_date
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS tb_registro_ventas (
-        id_ventas INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_venta INTEGER  NOT NULL,
         id_bodega TEXT NOT NULL,
         sku TEXT NOT NULL,
-        precio_unitario FLOAT NOT NULL,
-        precio_total FLOAT NOT NULL,
-        fecha TIMESTAMP NOT NULL,
-        hora TIMESTAMP NOT NULL,
+        peso NUMERIC NOT NULL,
+        cantidad INTEGER NOT NULL,
+        precio_unitario NUMERIC NOT NULL,       
+        precio_total NUMERIC NOT NULL,
         medio_pago TEXT NOT NULL,
         estado_venta TEXT NOT NULL,
         insert_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP

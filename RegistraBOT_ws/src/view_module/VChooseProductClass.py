@@ -40,87 +40,50 @@ class ResizeImage(QWidget):
             painter.drawPixmap(self.rect(), self.p)
 
 
-class VElegirProducto(QMainWindow):
-    def __init__(self, productos_info=None):
-        super().__init__()
+class VElegirProducto(QDialog):
+
+    def __init__(self, productos_info=None,  parent=None):
+        super().__init__(parent, Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setFixedSize(400, 240)  # Tamaño del diálogo
+        self.setModal(True)
+        self.setStyleSheet("background-color: white; ")
+        self.font = QFont('Tahoma', 12)
+
+        self.roudend_borders()
         self.setup_ui()
-        self.create_navbar()
 
         if productos_info is not None:
             self.create_product_block(productos_info)
         else:
             print("No se han proporcionado productos_info.")
 
-        self.update_clock()
+    def roudend_borders(self): 
+        radius = 15
+        mask = QBitmap(self.size())
+        mask.fill(Qt.white)
+        painter = QPainter(mask)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(Qt.black)
+        painter.drawRoundedRect(self.rect(), radius, radius)
+        painter.end()
+        self.setMask(mask)
 
     def setup_ui(self):
-        self.setWindowTitle("Ventana Elegir Producto")
-        self.setFixedSize(480, 320)
-        self.setStyleSheet("background-color: white;")
-
-        self.central_wgt = QLabel(self)
-        self.central_wgt.setGeometry(10, 10, 460, 300)
+        self.central_wgt = QFrame(self)
+        self.central_wgt.setGeometry(10, 10, 380, 220)
+        self.central_wgt.setStyleSheet("background-color: white;")
         self.layoutVC = QVBoxLayout(self.central_wgt)
+        self.layoutVC.setAlignment(Qt.AlignVCenter)
         self.layoutVC.setSpacing(14)
         self.layoutVC.setContentsMargins(0, 0, 0, 0)
 
         self.H1 = QFont("Tahoma", 21)
         self.H2 = QFont("Tahoma", 12, QFont.Bold)
-        self.H3 = QFont("Tahoma", 11)
+        self.H3 = QFont("Tahoma", 10)
         self.H4 = QFont("Tahoma", 9)
         self.H5 = QFont("Tahoma", 19, QFont.Bold)
         self.H6 = QFont("Tahoma", 14)
         self.H7 = QFont("Tahoma", 16, QFont.Bold)
-
-    def create_navbar(self):
-        self._navBar_wgt = QLabel(self.central_wgt)
-        self._navBar_wgt.setFixedHeight(45)
-        self._navBar_wgt.setStyleSheet("background-color: #FF8811; border-radius: 10px;")
-        self._navBarHC = QHBoxLayout(self._navBar_wgt)
-        self._navBarHC.setContentsMargins(15, 0, 15, 0)
-
-        self._date = datetime.now()
-        self._formatted_date = self._date.strftime("%d/%m/%Y")
-        self._dateLabel = QLabel(self._formatted_date, self._navBar_wgt)
-        self._dateLabel.setFont(self.H6)
-        self._dateLabel.setStyleSheet("background-color: #FF8811; color: white;")
-        self._dateLabel.setFixedSize(120, 45)
-
-        self._time = QLabel('', self._navBar_wgt)
-        self._time.setFont(self.H6)
-        self._time.setStyleSheet("background-color: #FF8811; color: white;")
-        self._time.setFixedSize(120, 45)
-
-        self._carListItem_wgt = QLabel(self._navBar_wgt)
-        self._carListItemHC = QHBoxLayout(self._carListItem_wgt)
-        self._carListItemHC.setContentsMargins(0, 0, 0, 0)
-        
-        self._carShop = QLabel(self._carListItem_wgt)
-        car_shop_image_path = 'view_module/images/Cart.png'
-        if os.path.exists(car_shop_image_path):
-            self._carShopImage = QPixmap(car_shop_image_path)
-            self._carShop.setPixmap(self._carShopImage)
-            self._carShop.setStyleSheet("background-color: #FF8811;")
-        else:
-            print(f"Image not found: {car_shop_image_path}")
-
-        self._buyList = QLabel('Lista de Compra:', self._carListItem_wgt)
-        self._buyList.setFont(self.H6)
-        self._buyList.setStyleSheet("background-color: #FF8811; color: white;")
-
-        self._item = QLabel(self._carListItem_wgt)
-        self._item.setFixedSize(30, 30)
-        self._item.setStyleSheet("background-color: white; border-radius: 15px;")
-
-        self._carListItemHC.addWidget(self._carShop)
-        self._carListItemHC.addWidget(self._buyList)
-        self._carListItemHC.addWidget(self._item)
-
-        self._navBarHC.addWidget(self._dateLabel)
-        self._navBarHC.addWidget(self._time)
-        self._navBarHC.addWidget(self._carListItem_wgt)
-
-        self.layoutVC.addWidget(self._navBar_wgt)
 
     def create_product_block(self, productos_info):
 
@@ -129,7 +92,7 @@ class VElegirProducto(QMainWindow):
         self._productsBlock_wgt = QLabel(self.central_wgt)
         self._productsBlock_wgt.setFixedHeight(226)
         self._productsBlockHC = QHBoxLayout(self._productsBlock_wgt)
-        self._productsBlockHC.setSpacing(20)
+        self._productsBlockHC.setSpacing(10)
         self._productsBlockHC.setContentsMargins(0, 0, 0, 0)
 
         self.product_info = []
@@ -173,13 +136,15 @@ class VElegirProducto(QMainWindow):
         product_label_HC.setSpacing(0)
 
         product_label_num_wgt = QLabel(label_num, product_label_wgt)
-        product_label_num_wgt.setFixedWidth(40)
-        product_label_num_wgt.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        #product_label_num_wgt.setFixedWidth(40)
+        product_label_num_wgt.setAlignment( Qt.AlignVCenter)
         product_label_num_wgt.setStyleSheet("background-color: #F3F3F3; color: #FF8811;")
+        product_label_num_wgt.setFont(self.H3)
         
         product_label_text_wgt = QLabel(label_text, product_label_wgt)
-        product_label_text_wgt.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        product_label_text_wgt.setStyleSheet("background-color: #F3F3F3; color: #6C6C6C; padding: 5px;")
+        product_label_text_wgt.setAlignment(Qt.AlignVCenter)
+        product_label_text_wgt.setStyleSheet("background-color: #F3F3F3; color: #6C6C6C;")
+        product_label_text_wgt.setFont(self.H3)
 
         product_label_HC.addWidget(product_label_num_wgt)
         product_label_HC.addWidget(product_label_text_wgt)
@@ -189,18 +154,21 @@ class VElegirProducto(QMainWindow):
 
         parent_layout.addWidget(product_block_wgt)
 
-    def update_clock(self):
-        now = datetime.now().strftime("%H:%M:%S")
-        self._time.setText(now)
-        QTimer.singleShot(1000, self.update_clock)
-
     def clearLayout(self, layout):
-        n=1
+        n=0
         if layout is not None:
-            while layout.count()>1:
+            while layout.count()>n:
                 item = layout.takeAt(n)
                 widget = item.widget()
                 if widget is not None:
                     widget.deleteLater()
                 else:
                     self.clearLayout(item.layout())
+
+
+    def show_in_center(self, parent_geometry):
+        self_geometry = self.geometry()
+        x = parent_geometry.x() + (parent_geometry.width() - self_geometry.width()) // 2
+        y = parent_geometry.y() + (parent_geometry.height() - self_geometry.height()) // 2
+        self.move(x, y)
+        self.show()

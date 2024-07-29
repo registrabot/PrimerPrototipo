@@ -85,22 +85,30 @@ class VPayment(QDialog):
         self.show()
 
     def MatrixKeyPressEvent(self, key):
-        if key == "1" or key == "3" or key == "4":
+        if key == "1":
             self.hide() 
-            return "VTotal"
+            return "VTotal", "efectivo"
+
+        elif key == "3":
+            self.hide() 
+            return "VTotal", "pos"
+        
+        elif key == "4":
+            self.hide() 
+            return "VTotal", "transferencia"
                 
         elif key == "2":
             self.hide() 
-            return "VDWallet"
+            return "VDWallet", ""
         
         elif key == "#":
             self.hide() 
-            return "VConfirm"
+            return "VConfirm", ""
 
         elif key == "D":
             self.hide() 
-            return "VProduct"
+            return "VProduct", ""
         
         else:
-            return "VPayment"
+            return "VPayment", ""
         

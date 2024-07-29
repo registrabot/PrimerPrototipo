@@ -128,9 +128,9 @@ class VDWallet(QDialog):
     def MatrixKeyPressEvent(self, key):
         if key == "1":
             self.hide() 
-            return "VTotal"
+            return "VTotal", "yape"
                 
         elif key == "2":
             self.hide() 
-            return "VTotal"
+            return "VTotal", "plin"
         

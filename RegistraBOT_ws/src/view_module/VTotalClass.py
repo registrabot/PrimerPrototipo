@@ -4,7 +4,9 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-
+import sqlite3
+from ticketprinter_module.TicketPrinterClass import TicketPrinter
+import numpy as np
 # Esta clase ResizeImage se mantiene igual
 class VTotal(QDialog):
     def __init__(self, parent=None):
@@ -24,6 +26,10 @@ class VTotal(QDialog):
         self.layout_text_total()
         self.layout_button_finish()
         self.layout_button()
+        self.venta_info = []
+        self.id_bodega = 12345
+
+        
  
     def roudend_borders(self): 
         radius = 15
@@ -118,20 +124,69 @@ class VTotal(QDialog):
 
     def show_total(self, total):
         self.text_total.setText(f"S/{total}")
-        
 
+    def upload_sell_data(self, estado_venta):
+        DB_connector = sqlite3.connect('./database_RegistraBOT/BD_RegistraBOT.db')
+        cursor = DB_connector.cursor()
+
+        id_venta = 0
+
+        cursor.execute('SELECT MAX(id_venta) FROM tb_registro_ventas')
+        last_id_venta = cursor.fetchone()
+
+        if len(last_id_venta) > 0:
+            id_venta = int(last_id_venta[0]+ 1)
+        else:
+            id_venta = int(0)
+
+        for producto in self.venta_info[1]:
+            item = [] # id_venta, id_bodega, sku, peso, cantidad, precio_unitario, precio_total, medio_pago, estado_venta
+            
+            item.append(id_venta)
+            item.append(str(self.id_bodega))
+            item.append(producto[4]) # SKU
+            if producto[4].split('-')[0] == 'GR':
+                item.append(producto[1]) # peso
+                item.append(int(0)) # cantidad
+            else:
+                item.append(0.0) # peso
+                item.append(int(producto[1])) # cantidad
+            item.append(producto[2]) # precio_unitario
+            item.append(producto[3]) # precio_total
+            item.append(self.venta_info[0]) # medio_pago
+            item.append(estado_venta) # estado_venta
+
+            cursor.executemany('INSERT INTO tb_registro_ventas (id_venta, id_bodega, sku, peso, cantidad, precio_unitario, precio_total, medio_pago, estado_venta) VALUES (?,?,?,?,?,?,?,?,?)', [tuple(item)])
+            DB_connector.commit()
+            #DB_connector.close()
 
     def MatrixKeyPressEvent(self, key):
         if key == "C":
-            self.hide() 
+            self.hide()
+            self.upload_sell_data("venta realizada")
+
+            printer = TicketPrinter()
+            # Agregar productos de ejemplo
+
+            for producto in self.venta_info[1]:
+                if producto[4].split('-')[0] == 'GR':
+                    printer.agregar_producto(producto[0], np.round(producto[1],1), np.round(producto[3],1))
+                else:
+                    printer.agregar_producto(producto[0], producto[1], np.round(producto[3],1))
+
+            # Imprimir el ticket en el terminal
+            printer.imprimir_ticket()
+
             return "VProduct"
 
         elif key == "#":
+            self.venta_info.clear()
             self.hide() 
             return "VPayment"
 
         elif key == "D":
             self.hide() 
+            self.upload_sell_data("venta no realizada")
             return "VProduct"
         
         else:

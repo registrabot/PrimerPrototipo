@@ -16,8 +16,6 @@ class VProductList(QWidget):
         self.font2 = QFont('Tahoma', 12)
         self.font2.setBold(True)
 
-
-
         self.layout_general()
         self.layout_header()
         self.layout_table()
@@ -129,12 +127,13 @@ class VProductList(QWidget):
         self.layout_vertical.addWidget(self.table)
 
     def mostrar_elementos(self, elementos):
+        print(elementos)
         self.product_list = self.agrupar_y_sumar(elementos)
         self.table_content.setRowCount(len(self.product_list))
         self.suma_total=self.sum_last_elements(self.product_list)
         self.total_label_total_value.setText(f"{self.suma_total}")
         for i, elemento in enumerate(self.product_list):
-            producto, cantidad, precio , total = elemento
+            producto, cantidad, precio , total, _ = elemento
             producto_item = QTableWidgetItem(producto)
             cantidad_item = QTableWidgetItem(str(cantidad))
             precio_item = QTableWidgetItem(str(precio))
@@ -143,6 +142,7 @@ class VProductList(QWidget):
             self.table_content.setItem(i, 1, cantidad_item)
             self.table_content.setItem(i, 2, precio_item)
             self.table_content.setItem(i, 3, total_item)
+        print(self.product_list)
         if len(self.product_list) > 0:
             self.table_content.selectRow(0)
 
@@ -257,7 +257,7 @@ class VProductList(QWidget):
                     self.table_content.selectRow(len(self.product_list) - 1)
         elif key == "B":
             #self.hide()
-            return "VProductAdd"
+            return "VProduct"
         elif key == "C":
             print("Lista de elementos:", self.product_list)
             

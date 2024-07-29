@@ -302,6 +302,8 @@ class VProducto(QMainWindow):
             except Exception as e:
                 print(f"Error: {e}")
 
+
+
     def calculate_product_price(self):
         self.product_price = self.weight_product * self.price_value_float
         self.product_price_updated.emit(self.product_price)
